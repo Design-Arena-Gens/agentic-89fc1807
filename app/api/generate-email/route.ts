@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
-});
-
 export async function POST(request: NextRequest) {
   try {
     const { recipient, purpose, yourName, yourCompany } = await request.json();
+
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json(
+        { error: 'AI generation is not configured. Please add OPENAI_API_KEY to environment variables.' },
+        { status: 503 }
+      );
+    }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
 
     const prompt = `You are an expert at writing compelling cold emails. Generate a professional, personalized, and attractive cold email with the following details:
 
